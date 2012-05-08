@@ -1,0 +1,163 @@
+#!/bin/bash
+###############################################
+###############################################
+
+. /usr/local/nagios/libexec/utils.sh
+
+
+VERSION="1.1"
+
+GREP=/bin/grep
+CUT=/usr/bin/cut
+
+FLAG_VERBOSE=FALSE
+interface=""
+LEVEL_WARN="0"
+LEVEL_CRIT="0"
+RESULT=""
+
+received_bytes=""
+old_received_bytes=""
+transmitted_bytes=""
+old_transmitted_bytes=""
+
+warn=20000  # i.e 20Kbps
+crit=15000  # i.e 15KBps
+
+
+###############################################
+#
+## FUNCTIONS
+#
+
+## Print usage
+usage() {
+        echo " check_netio $VERSION - Nagios network I/O check script"
+        echo ""
+        echo " Usage: check_netio {-i} [ -v ] [ -h ]"
+        echo ""
+        echo "           -i  Interface to check (e.g. eth0)"
+        echo "           -v  Verbose output (ignored for now)"
+        echo "           -h  Show this page"
+        echo ""
+}
+
+## Process command line options
+doopts() {
+        if ( `test 0 -lt $#` )
+        then
+                while getopts i:vh myarg "$@"
+                do
+                        case $myarg in
+                                h|\?)
+                                        usage
+                                        exit;;
+                                i)
+                                        interface=$OPTARG;;
+                                v)
+                                        FLAG_VERBOSE=TRUE;;
+                                *)      # Default
+                                        usage
+                                        exit;;
+                        esac
+                done
+        else
+                usage
+                exit
+        fi
+}
+
+
+# This function parses /proc/net/dev file searching for a line containing $interface data.
+# Within that line, the first and ninth numbers after ':' are respectively the received and transmited bytes.
+function get_bytes
+{
+    line=$(cat /proc/net/dev | grep $interface | cut -d ':' -f 2 | awk '{print "received_bytes="$1, "transmitted_bytes="$9}')
+    eval $line
+}
+
+
+# Function which calculates the speed using actual and old byte number.
+# Speed is shown in KByte per second when greater or equal than 1 KByte per second.
+# This function should be called each second.
+function get_velocity
+{
+    value=$1
+    old_value=$2
+
+    let vel=$value-$old_value
+    let vel=$vel*8
+    #let velKb=$vel/1000
+    #velKb=$(echo "scale=3; $vel/1000.0" | bc ) # Convert to decimal.
+    #if [ $velKb != 0 ];
+    #then
+ #echo -n "$velKb Kb/s";
+    #else
+ #echo -n "$vel b/s";
+   # fi
+echo -n "$vel";
+}
+
+# Write output and return result
+theend() {
+        echo -en $RESULT
+        exit $EXIT_STATUS
+}
+
+
+
+# Handle command line options
+doopts $@
+
+# Do the do
+
+get_bytes
+old_received_bytes=$received_bytes
+old_transmitted_bytes=$transmitted_bytes
+sleep 1;
+# Get new transmitted and received byte number values.
+get_bytes
+    # Calculates speeds.
+    vel_recv=$(get_velocity $received_bytes $old_received_bytes)
+    vel_trans=$(get_velocity $transmitted_bytes $old_transmitted_bytes)
+    
+
+     vel_recvKb=$(echo "scale=3; $vel_recv/1000.0" | bc ) # Convert to decimal
+     vel_transKb=$(echo "scale=3; $vel_trans/1000.0" | bc ) # Convert to decimal 
+
+
+    let vel_total=$vel_recv+$vel_trans
+    
+    vel_totalKB=$(echo "scale=3; $vel_total/1000.0" | bc ) # Convert to decimal  
+    #vel_total=$(echo "scale=3;$vel_recv+$vel_trans" | bc ) 
+    #RESULT="NETIO OK : - $interface DOWN:$vel_recv\tUP:$vel_trans\n"
+
+
+#if crit > vel >warn then warning
+if [ $vel_total -lt $crit ]; then
+if [ $vel_total -ge $warn ]; then
+RESULT="NETIO WARNING: - $interface DOWN:$vel_recvKb Kbps\t UP:$vel_transKB Kbps \tTOTAL:$vel_totalKB Kbps\n"
+exitstatus=$STATE_WARNING
+#exit $exitstatus
+fi
+fi
+# vel>crit then critical
+if [ $vel_total -ge $crit ]; then
+RESULT="NETIO CRITICAL: - $interface DOWN:$vel_recvKb Kbps \tUP:$vel_transKb Kbps \tTOTAL:$vel_totalKB Kbps\n"
+exitstatus=$STATE_CRITICAL
+#exit $exitstatus
+fi
+
+# 0<=vel <warn
+if [ $vel_total -lt $warn ]; then
+RESULT="NETIO OK : - $interface DOWN:$vel_recvKb Kbps \tUP:$vel_transKb Kbps \tTOTAL:$vel_totalKB Kbps \n"
+exitstatus=$STATE_OK
+#exit $exitstatus
+fi
+
+
+
+
+# Quit and return information and exit status
+theend
+
