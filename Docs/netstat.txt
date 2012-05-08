@@ -1,0 +1,168 @@
+Get Detailed Information About Particular IP address Connections Using netstat Command
+
+netstat command and shell pipe feature can be used to dig out more information about particular IP address connection. You can find out total established connections, closing connection, SYN and FIN bits and much more. You can also display summary statistics for each protocol using netstat.
+
+This is useful to find out if your server is under attack or not. You can also list abusive IP address using this method.
+# netstat -nat | awk '{print $6}' | sort | uniq -c | sort -n
+Output:
+
+      1 CLOSE_WAIT
+      1 established)
+      1 Foreign
+      3 FIN_WAIT1
+      3 LAST_ACK
+     13 ESTABLISHED
+     17 LISTEN
+    154 FIN_WAIT2
+    327 TIME_WAIT
+
+Dig out more information about a specific ip address:
+# netstat -nat |grep {IP-address} | awk '{print $6}' | sort | uniq -c | sort -n
+
+      2 LAST_ACK
+      2 LISTEN
+      4 FIN_WAIT1
+     14 ESTABLISHED
+     91 TIME_WAIT
+    130 FIN_WAIT2
+
+Busy server can give out more information:
+# netstat -nat |grep 202.54.1.10 | awk '{print $6}' | sort | uniq -c | sort -n
+Output:
+
+  15 CLOSE_WAIT
+  37 LAST_ACK
+  64 FIN_WAIT_1
+  65 FIN_WAIT_2
+1251 TIME_WAIT
+3597 SYN_SENT
+5124 ESTABLISHED
+
+Get List Of All Unique IP Address
+
+To print list of all unique IP address connected to server, enter:
+# netstat -nat | awk '{ print $5}' | cut -d: -f1 | sed -e '/^$/d' | uniq
+To print total of all unique IP address, enter:
+# netstat -nat | awk '{ print $5}' | cut -d: -f1 | sed -e '/^$/d' | uniq | wc -l
+Output:
+
+449
+
+Find Out If Box is Under DoS Attack or Not
+
+If you think your Linux box is under attack, print out a list of open connections on your box and sorts them by according to IP address, enter:
+# netstat -atun | awk '{print $5}' | cut -d: -f1 | sed -e '/^$/d' |sort | uniq -c | sort -n
+Output:
+
+    1 10.0.77.52
+      2 10.1.11.3
+      4 12.109.42.21
+      6 12.191.136.3
+.....
+...
+....
+    13 202.155.209.202
+     18 208.67.222.222
+     28 0.0.0.0
+    233 127.0.0.1
+
+You can simply block all abusive IPs using iptables or just null route them.
+Get Live View of TCP Connections
+
+You can use tcptrack command to display the status of TCP connections that it sees on a given network interface. tcptrack monitors their state and displays information such as state, source/destination addresses and bandwidth usage in a sorted, updated list very much like the top command.
+Display Summary Statistics for Each Protocol
+
+Simply use netstat -s:
+# netstat -s | less
+# netstat -t -s | less
+# netstat -u -s | less
+# netstat -w -s | less
+# netstat -s
+Output:
+
+Ip:
+    88354557 total packets received
+    0 forwarded
+    0 incoming packets discarded
+    88104061 incoming packets delivered
+    96037391 requests sent out
+    13 outgoing packets dropped
+    66 fragments dropped after timeout
+    295 reassemblies required
+    106 packets reassembled ok
+    66 packet reassembles failed
+    34 fragments failed
+Icmp:
+    18108 ICMP messages received
+    58 input ICMP message failed.
+    ICMP input histogram:
+        destination unreachable: 7173
+        timeout in transit: 472
+        redirects: 353
+        echo requests: 10096
+    28977 ICMP messages sent
+    0 ICMP messages failed
+    ICMP output histogram:
+        destination unreachable: 18881
+        echo replies: 10096
+Tcp:
+    1202226 active connections openings
+    2706802 passive connection openings
+    7394 failed connection attempts
+    47018 connection resets received
+    23 connections established
+    87975383 segments received
+    95235730 segments send out
+    681174 segments retransmited
+    2044 bad segments received.
+    80805 resets sent
+Udp:
+    92689 packets received
+    14611 packets to unknown port received.
+    0 packet receive errors
+    96755 packets sent
+TcpExt:
+    48452 invalid SYN cookies received
+    7357 resets received for embryonic SYN_RECV sockets
+    43 ICMP packets dropped because they were out-of-window
+    5 ICMP packets dropped because socket was locked
+    2672073 TCP sockets finished time wait in fast timer
+    441 time wait sockets recycled by time stamp
+    368562 delayed acks sent
+    430 delayed acks further delayed because of locked socket
+    Quick ack mode was activated 36127 times
+    32318597 packets directly queued to recvmsg prequeue.
+    741479256 packets directly received from backlog
+    1502338990 packets directly received from prequeue
+    18343750 packets header predicted
+    10220683 packets header predicted and directly queued to user
+    17516622 acknowledgments not containing data received
+    36549771 predicted acknowledgments
+    102672 times recovered from packet loss due to fast retransmit
+    Detected reordering 1596 times using reno fast retransmit
+    Detected reordering 1 times using time stamp
+    8 congestion windows fully recovered
+    32 congestion windows partially recovered using Hoe heuristic
+    19 congestion windows recovered after partial ack
+    0 TCP data loss events
+    39951 timeouts after reno fast retransmit
+    29653 timeouts in loss state
+    197005 fast retransmits
+    186937 retransmits in slow start
+    131433 other TCP timeouts
+    TCPRenoRecoveryFail: 20217
+    147 times receiver scheduled too late for direct processing
+    29010 connections reset due to unexpected data
+    365 connections reset due to early user close
+    6979 connections aborted due to timeout
+
+Display Interface Table
+
+You can easily display dropped and total transmitted packets with netstat for eth0:
+# netstat --interfaces eth0
+Output:
+
+Kernel Interface table
+Iface       MTU Met    RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg
+eth0       1500   0  2040929      0      0      0  3850539      0      0      0 BMRU
+
