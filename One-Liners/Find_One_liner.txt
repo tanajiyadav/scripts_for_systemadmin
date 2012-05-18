@@ -1,0 +1,51 @@
+    # Find a file and delete it. Replace foo.bar with the file or use wild cards *.bar
+    $ find /home -name foo.bar -type f -exec rm -f "{}" ';'
+     
+    # When trying to find large files in / filesytem
+    # the find command will return results from
+    # other files systems. Try using the -dev option.
+    $ find / -dev -size +3000 -exec ls -l {} ;
+     
+    # This will not return files in /usr/local file system.
+    # This will return files large then 3000 blocks
+    # only in the root file system.
+    $ find /usr -dev -size +5000 -exec ls -l {} ;
+     
+    # Someone's done a 'cp -r' and filled up
+    # the filesystem. Here's a simple way to locate the unwanted files...
+    $ find . -ctime -1 -print
+     
+    # Find has a partiularly powerful mechanism, -exec,
+    # which lets you execute commands on a per-file
+    # basis, while being selective about the files you're operating on.
+    # Lets say we want to delete all the *.bak or *.backup
+    # files which are older than 30 days.
+    # Type the following all on 1 line.
+    $ find . ( -name '*.bak' -o -name *.backup ) -type f -atime +30 -exec rm '{}' ;
+    # It would be even better if we only deleted
+    # the *.bak file if the original file was still
+    # available. In this case, we can use csh and test to help
+    # Type the following all on 1 line.
+    $ find . ( -name '*.bak' -o -name *.backup ) -type f -atime +30 -exec csh -c 'if ( -f $1:r ) rm $1' '{}' ;
+    # or if you're really paraniod, use 'test -s'
+    # to verify that the original file has not been truncated
+    # Type the following all on 1 line.
+    $ find . -name '*.bak' -type f -atime +30 -exec csh -c 'test -s $1:r && rm $1' '{}' ;
+     
+    # Protecting users from themselves - file permissions
+    $ find . -type l -exec gawk 'BEGIN { "ls -lag}' /dev/null ;
+     
+    # Find text in whole directory tree:
+    $ find . -type f | xargs grep "text"
+     
+    # Find and Replace in whole directory tree:
+    $ find . -type f [-name "..."] -exec perl -pi -e 's|xxx|yyy|g' {} ;
+     
+    for example:
+    find . -type f -name "*html" -exec
+    perl -pi -e 's|pibeta.psi.ch/~stefan|midas.psi.ch/~stefan|g' {} ;
+     
+    # Show sorted file size of subtree
+    $ du -a . | sort -r -n | less
+
+
