@@ -1,0 +1,79 @@
+Want to know many bytes a terabyte is? If you know further abbreviations, you can extend the list. 
+
+	import pprint;pprint.pprint(zip(('Byte', 'KByte', 'MByte', 'GByte', 'TByte'), (1 << 10*i for i in xrange(5))))
+
+And what's the largest number that can be represented by 8 Byte? 
+
+	print '\n'.join("%i Byte = %i Bit = largest number: %i" % (j, j*8, 256**j-1) for j in (1 << i for i in xrange(8)))
+
+Function that returns the set of all subsets of its argument 
+
+	f = lambda x: [[y for j, y in enumerate(set(x)) if (i >> j) & 1] for i in range(2**len(set(x)))]
+
+
+	>>>f([10,9,1,10,9,1,1,1,10,9,7])
+	[[], [9], [10], [9, 10], [7], [9, 7], [10, 7], [9, 10, 7], [1], [9, 1], [10, 1], [9, 10, 1], [7, 1], [9, 7, 1], [10, 7, 1], [9, 10, 7, 1]]
+
+Alternately (shorter, more functional version):
+
+	f = lambda l: reduce(lambda z, x: z + [y + [x] for y in z], l, [[]])
+
+Decode a base64 encoded file
+
+	import base64, sys; base64.decode(open(sys.argv[1], "rb"), open(sys.argv[2], "wb"))
+
+Editing a list of files in place
+Toggle line numbers
+
+    import sys,os,re,fileinput;a=[i[2] for i in os.walk('.') if i[2]] [0];[sys.stdout.write(re.sub('at','op',j)) for j in fileinput.input(a,inplace=1)]
+
+	Clearer is: import os.path; a=[f for f in os.listdir('.') if not os.path.isdir(f)]
+
+Print every line from an input file but remove the first two fields.
+
+	python -c "import sys;[sys.stdout.write(' '.join(line.split(' ')[2:])) for line in sys.stdin]" < input.txt 
+
+
+Apply regular expression to lines from stdin
+
+[another command] | python -c "import sys,re;[sys.stdout.write(re.sub('PATTERN', 'SUBSTITUTION', line)) for line in sys.stdin]"
+
+Modify lines from stdin using map
+
+python -c "import sys; tmp = lambda x: sys.stdout.write(x.split()[0]+'\t'+str(int(x.split()[1])+1)+'\n'); map(tmp, sys.stdin);"
+
+Display List of all users on Unix-like systems
+
+print '\n'.join(line.split(":",1)[0] for line in open("/etc/passwd"))
+
+Compress CSS file
+
+python -c 'import re,sys;print re.sub("\s*([{};,:])\s*", "\\1", re.sub("/\*.*?\*/", "", re.sub("\s+", " ", sys.stdin.read())))'
+
+Decode string written in Hex
+
+python -c "print ''.join(chr(int(''.join(i), 16)) for i in zip(*[iter('474e552773204e6f7420556e6978')]*2))"
+
+Retrieve content text from HTTP data
+
+python -c "import sys; print sys.stdin.read().replace('\r','').split('\n\n',2)[1]";
+
+Prints file extension
+
+print '~/python/one-liners.py'.split('.')[-1]
+
+Escapes content from stdin
+
+This can be used to convert a string into a "url safe" string
+
+python -c "import urllib, sys ; print urllib.quote_plus(sys.stdin.read())";
+
+Reverse lines in stdin
+
+python -c "import sys; print '\n'.join(reversed(sys.stdin.read().split('\n')))"
+
+Print top 10 lines of stdin
+
+python -c "import sys; sys.stdout.write(''.join(sys.stdin.readlines()[:10]))" < /path/to/your/file
+
+
