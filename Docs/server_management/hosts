@@ -1,0 +1,24 @@
+#172.31.40.10    Prod_West_Redis_Master        54.186.176.229
+
+#172.31.35.39    Prod_West_Redis_Slave_1       54.186.15.72
+#172.31.16.151   Prod_West_Redis_Slave_2       54.186.184.106
+#172.31.13.250   Prod_West_Redis_Slave_3       54.186.19.214
+#172.31.0.163    Prod_West_Redis_Standby       54.186.168.59
+
+
+#172.31.44.248   Prod_West_Redis_DataProc_1    54.186.140.18
+#172.31.4.150    Prod_West_Redis_DataProc_2    54.186.181.0
+
+#172.31.34.172   Prod_West_WTE                 54.186.211.1
+#172.31.43.149   Prod_West_TWS_Triggers_1      54.186.209.92
+#172.31.41.90    Prod_West_TWS_Triggers1_1     54.186.236.59
+#172.31.43.103   Prod_West_TWS_Triggers_2      54.187.10.34
+#172.31.40.19    Prod_West_TWS_Triggers1_2     54.187.10.201
+#172.31.43.27    Prod_West_TWS_Triggers_3      54.186.17.227
+#172.31.38.203   Prod_West_TWS_Triggers1_3     54.186.191.192
+
+#172.31.16.4     Prod_West_MySQL_Slave         54.186.212.107
+
+#172.31.5.82     Prod_West_Zabbix              54.186.146.58
+#172.31.11.66    Prod_West_RT_Mail             54.186.187.26
+#172.31.13.0     Prod_West_LogStash            54.186.175.21
