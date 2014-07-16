@@ -2,7 +2,7 @@
 require "rubygems"
 require "zabbixapi"
 
-zabbix_server = "http://54.84.126.242/zabbix/api_jsonrpc.php"
+zabbix_server = "http://54/zabbix/api_jsonrpc.php"
 group = "EU_TWS_SERVERS"
 
 ####################################
@@ -16,8 +16,8 @@ ip=ip.gsub!(/.eu.west.1.compute.amazonaws.com/, "")
 
 zbx = ZabbixApi.connect(
   :url => "#{zabbix_server}",
-  :user => 'tanaji.yadav@weather.com',
-  :password => '@password1.0'
+  :user => 't',
+  :password => '@'
 )
 
 zbx.hosts.create(

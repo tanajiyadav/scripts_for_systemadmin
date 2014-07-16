@@ -2,7 +2,7 @@
 require "rubygems"
 require "zabbixapi"
 
-zabbix_server = "http://54.84.126.242/zabbix/api_jsonrpc.php"
+zabbix_server = "http://54/zabbix/api_jsonrpc.php"
 
 ####################################
 File.readlines("zabbixhosts_eu").each {|host|
@@ -11,8 +11,8 @@ hostname=list[0]
 
 zbx = ZabbixApi.connect(
   :url => "#{zabbix_server}",
-  :user => 'tanaji.yadav@weather.com',
-  :password => '@password1.0'
+  :user => 't',
+  :password => '@'
 )
 
 zbx.templates.mass_add(
